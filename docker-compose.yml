@@ -1,0 +1,49 @@
+version: '3.1'
+
+services:
+
+  front-end:
+    image: node:20
+    working_dir: /app
+    # build:
+    #   context: front-end
+    #   dockerfile: Dockerfile.development
+    environment:
+      VUE_APP_BASE_URL: http://localhost:3000/
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./front-end/:/app/
+    # command: ["ls", "-lah"]
+    command: [ "npm", "run", "serve" ]
+
+  product-api:
+    image: node:20
+    working_dir: /app
+    # build:
+    #   context: product-api/
+    #   dockerfile: Dockerfile.development
+    environment:
+      MONGODB_ENDPOINT: mongo
+      MONGODB_PORT: 27017
+      MONGODB_USERNAME: product-api
+      MONGODB_PASSWORD: product-api-password
+      MONGODB_DATABASE: products
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongo
+    volumes:
+      - ./product-api/:/app/
+    command: [ "npm", "run", "dev" ]
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro

@@ -3,7 +3,7 @@ module.exports = defineConfig({
   transpileDependencies: true,
   devServer: {
     host: '0.0.0.0',
-    port: 8080,
+    port: process.env.PORT || 8080,
     allowedHosts: [
         'npm-container' // My Dev Environment is inside a container
     ]
