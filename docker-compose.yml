@@ -58,9 +58,22 @@ services:
     volumes:
       - redis-data:/data
 
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"   # RabbitMQ main port
+      - "15672:15672" # RabbitMQ management plugin port
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: rabbitmq-password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
 volumes:
   mongo-data:
   redis-data:
+  rabbitmq_data:
 
 networks:
   ecommercelab:

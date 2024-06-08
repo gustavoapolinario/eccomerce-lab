@@ -2,12 +2,12 @@
   <div class="product-list">
       <h1>Vintage Video rental</h1>
       <ul>
-          <li v-for="product in products" :key="product.id" class="product-item">
+          <li v-for="product in products" :key="product._id" class="product-item">
               <img :src="product.image" :alt="product.name" class="product-image"/>
               <div class="product-details">
                   <h2>{{ product.name }}</h2>
                   <p>${{ product.price }}</p>
-                  <button @click="buyProduct(product.id)">Rent Now</button>
+                  <button @click="buyProduct(product._id)">Rent Now</button>
               </div>
           </li>
       </ul>
