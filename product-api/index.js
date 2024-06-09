@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const productRoutesWithCache = require('./Routes/productRoutesWithCache');
+const productRoutes = require('./Routes/productRoutes');
 const productRoutesWithoutCache = require('./Routes/productRoutesWithoutCache');
 const healthcheck = require('./Routes/healthCheckRoutes');
 
@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 // Use routes
-app.use(productRoutesWithCache);
+app.use(productRoutes);
 app.use(productRoutesWithoutCache);
 app.use(healthcheck);
 

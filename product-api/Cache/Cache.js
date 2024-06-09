@@ -1,13 +1,16 @@
 const redis = require('redis');
 
+getRedisUrl = _ => {
+  const redis_endpoint = process.env.REDIS_ENDPOINT;
+  const redis_port = process.env.REDIS_PORT;
+  const redis_username = process.env.REDIS_USERNAME;
+  const redis_password = process.env.REDIS_PASSWORD;
+  return `redis://${redis_username}:${redis_password}@${redis_endpoint}:${redis_port}`;
+}
+const redis_url = getRedisUrl();
+
 class Cache {
   constructor() {
-    const redis_endpoint = process.env.REDIS_ENDPOINT;
-    const redis_port = process.env.REDIS_PORT;
-    const redis_username = process.env.REDIS_USERNAME;
-    const redis_password = process.env.REDIS_PASSWORD;
-    const redisUrl = `redis://${redis_username}:${redis_password}@${redis_endpoint}:${redis_port}`;
-
     this.client = redis.createClient({
       url: redisUrl
     });
