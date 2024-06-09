@@ -12,7 +12,8 @@
   "description": "",
   "dependencies": {
     "amqplib": "^0.10.4",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "kafkajs": "^2.2.4"
   },
   "devDependencies": {
     "nodemon": "^3.1.3"
