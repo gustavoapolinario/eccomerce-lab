@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const ProductModel = require('./ProductModel');
 
-getMongoDBUrl = _ => {
+const getMongoDBUrl = _ => {
   const mongodb_endpoint = process.env.MONGODB_ENDPOINT;
   const mongodb_port = process.env.MONGODB_PORT || 27017;
   const mongodb_username = process.env.MONGODB_USERNAME;
@@ -17,31 +17,15 @@ class Database {
   }
 
   async _connect() {
-    try {
-      await mongoose.connect(mongodb_url);
-      console.log('Connected to MongoDB');
-    } catch (err) {
-      console.error('Failed to connect to MongoDB', err);
-      process.exit(1); // Exit process with failure
-    }
+    await mongoose.connect(mongodb_url);
   }
 
   async getProducts() {
-    try {
-      return await ProductModel.find();
-    } catch (err) {
-      console.error('Failed to get products', err);
-      throw err;
-    }
+    return await ProductModel.find();
   }
 
   async getProductById(id) {
-    try {
-      return await ProductModel.findById(id);
-    } catch (err) {
-      console.error('Failed to get product by ID', err);
-      throw err;
-    }
+    return await ProductModel.findById(id);
   }
 }
 

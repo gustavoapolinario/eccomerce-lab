@@ -1,6 +1,6 @@
 const amqp = require('amqplib');
 
-getRabbitMQUrl = _ => {
+const getRabbitMQUrl = _ => {
   const rabbitmq_endpoint = process.env.RABBITMQ_ENDPOINT;
   const rabbitmq_port = process.env.RABBITMQ_PORT || 5672;
   const rabbitmq_username = process.env.RABBITMQ_USERNAME;

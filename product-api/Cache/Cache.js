@@ -1,6 +1,6 @@
 const redis = require('redis');
 
-getRedisUrl = _ => {
+const getRedisUrl = _ => {
   const redis_endpoint = process.env.REDIS_ENDPOINT;
   const redis_port = process.env.REDIS_PORT;
   const redis_username = process.env.REDIS_USERNAME;
@@ -12,66 +12,42 @@ const redis_url = getRedisUrl();
 class Cache {
   constructor() {
     this.client = redis.createClient({
-      url: redisUrl
+      url: redis_url
     });
-
-    this.client.on('error', (err) => {
-      console.error('Redis error: ', err);
+    this.client.connect()
+    process.on("exit", function(){
+      this.client.quit();
     });
-
-    this.client.connect().catch(console.error);
   }
 
   async cacheProductListAsync(products) {
-    try {
-      await this.client.setEx('products', 3600, JSON.stringify(products)); // Cache the products for 1 hour
-    } catch (err) {
-      console.error('Failed to cache products:', err);
-    }
+    await this.client.setEx('products', 3600, JSON.stringify(products)); // Cache the products for 1 hour
   }
 
   async deleteProductListAsync() {
-    try {
-      await this.client.del('products');
-    } catch (err) {
-      console.error('Failed to delete cache:', err);
-    }
+    await this.client.del('products');
   }
 
   async getProductListAsync() {
-    try {
-      const data = await this.client.get('products');
-      return data ? JSON.parse(data) : null;
-    } catch (err) {
-      console.error('Failed to get products from cache:', err);
-      return null;
-    }
+    const data = await this.client.get('products');
+    return data ? JSON.parse(data) : null;
   }
 
   async cacheProductAsync(productId, product) {
-    try {
-      await this.client.setEx(`product-${productId}`, 3600, JSON.stringify(product)); // Cache the products for 1 hour
-    } catch (err) {
-      console.error('Failed to cache products:', err);
-    }
+    await this.client.setEx(`product-${productId}`, 3600, JSON.stringify(product)); // Cache the products for 1 hour
   }
 
   async deleteProductAsync(productId) {
-    try {
-      await this.client.del(`product-${productId}`);
-    } catch (err) {
-      console.error('Failed to delete cache:', err);
-    }
+    await this.client.del(`product-${productId}`);
   }
 
   async getProductAsync(productId) {
-    try {
-      const data = await this.client.get(`product-${productId}`);
-      return data ? JSON.parse(data) : null;
-    } catch (err) {
-      console.error('Failed to get products from cache:', err);
-      return null;
-    }
+    const data = await this.client.get(`product-${productId}`);
+    return data ? JSON.parse(data) : null;
+  }
+
+  async close() {
+    this.client.quit();
   }
 }
 
