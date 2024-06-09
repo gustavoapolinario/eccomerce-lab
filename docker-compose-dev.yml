@@ -1,15 +1,23 @@
 services:
 
   front-end:
-    build:
-      context: front-end
-      target: final
+    image: node:20
+    working_dir: /app
+    environment:
+      VUE_APP_BASE_URL: http://localhost:3000/
+      PORT: 8080
     ports:
-      - "8080:80"
+      - "8080:8080"
+    volumes:
+      - ./front-end/:/app/
+    command: [ "npm", "run", "serve" ]
 
+# Test buy product:
+# curl localhost:3000/products/
+# curl localhost:3000/products/$(curl -s localhost:3000/products/ | jq -r '.[0]._id')
   product-api:
-    build:
-      context: product-api
+    image: node:20
+    working_dir: /app
     environment:
       PORT: 3000
       MONGODB_ENDPOINT: mongo
@@ -23,13 +31,18 @@ services:
       REDIS_PASSWORD: your_redis_password
     ports:
       - "3000:3000"
+    volumes:
+      - ./product-api/:/app/
+    command: [ "npm", "run", "dev" ]
     depends_on:
       - mongo
       - redis
 
+# Test buy product:
+# curl -X POST localhost:3001/buy/$(curl -s localhost:3000/products/ | jq -r '.[0]._id')
   buy-api:
-    build:
-      context: buy-api
+    image: node:20
+    working_dir: /app
     environment:
       PORT: 3001
       PRODUCT_API_URL: http://product-api:3000
@@ -43,13 +56,16 @@ services:
       REDIS_PASSWORD: your_redis_password
     ports:
       - "3001:3001"
+    volumes:
+      - ./buy-api/:/app/
+    command: [ "npm", "run", "dev" ]
     depends_on:
       - rabbitmq
       - redis
 
   buy-job:
-    build:
-      context: buy-job
+    image: node:20
+    working_dir: /app
     environment:
       PORT: 3002
       RABBITMQ_ENDPOINT: rabbitmq
@@ -60,6 +76,9 @@ services:
       KAFKA_PORT: 9092
     ports:
       - "3002:3002"
+    volumes:
+      - ./buy-job/:/app/
+    command: [ "npm", "run", "dev" ]
     depends_on:
       - rabbitmq
       - kafka
@@ -89,6 +108,8 @@ services:
       RABBITMQ_DEFAULT_PASS: rabbitmq-password
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+
+
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest

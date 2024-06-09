@@ -37,7 +37,7 @@ export default {
   },
   methods: {
       fetchProducts() {
-          axios.get(`${process.env.VUE_APP_BASE_URL}products`)
+          axios.get(`${process.env.VUE_APP_PRODUCT_API_URL}products`)
               .then(response => {
                   this.products = response.data;
               })
@@ -46,7 +46,7 @@ export default {
               });
       },
       buyProduct(productId) {
-          axios.post(`${process.env.VUE_APP_BASE_URL}buy/${productId}`)
+          axios.post(`${process.env.VUE_APP_BUY_API_URL}buy/${productId}`)
               .then(response => {
                   this.dialogMessage = response.data.message;
                   this.dialogVisible = true;
