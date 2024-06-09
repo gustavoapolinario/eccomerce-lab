@@ -63,6 +63,23 @@ services:
       - rabbitmq
       - redis
 
+  buy-job:
+    image: node:20
+    working_dir: /app
+    environment:
+      PORT: 3002
+      RABBITMQ_ENDPOINT: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: rabbitmq
+      RABBITMQ_PASSWORD: rabbitmq-password
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./buy-job/:/app/
+    command: [ "npm", "run", "dev" ]
+    depends_on:
+      - rabbitmq
+
   mongo:
     image: mongo
     restart: always

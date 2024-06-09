@@ -5,7 +5,6 @@ const Queue = require('../Queue/Queue');
 const router = express.Router();
 
 const axios = require('axios');
-const amqp = require('amqplib/callback_api');
 const product_api_url = process.env.PRODUCT_API_URL;
 
 
@@ -17,9 +16,10 @@ const getProduct = async (productId) => {
 const publishBuyRequest = async (product) => {
   const queue = new Queue();
 
-  const exchange = 'buy_requests';
+  const queue_name = 'buy_requests';
   const msg = JSON.stringify({ productId: product._id, productName: product.name });
-  queue.sendMessage(exchange, msg)
+  queue.sendMessage(queue_name, msg);
+  queue.close();
 };
 
 // Buy a product by ID

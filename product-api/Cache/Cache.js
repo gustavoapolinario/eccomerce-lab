@@ -15,9 +15,7 @@ class Cache {
       url: redis_url
     });
     this.client.connect()
-    process.on("exit", function(){
-      this.client.quit();
-    });
+    process.on("exit", () => { this.client.quit(); });
   }
 
   async cacheProductListAsync(products) {

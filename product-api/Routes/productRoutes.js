@@ -8,7 +8,7 @@ const cache = new Cache();
 const db = new Database();
 
 // Middleware to check cache
-const checkCache = async (req, res, next) => {
+const checkCacheProductList = async (req, res, next) => {
   try {
     const data = await cache.getProductListAsync();
     if (data) {
@@ -21,15 +21,29 @@ const checkCache = async (req, res, next) => {
     next();
   }
 };
+const checkCacheProductId = async (req, res, next) => {
+  try {
+    const data = await cache.getProductAsync();
+    if (data) {
+      return res.status(200).json(data);
+    } else {
+      next();
+    }
+  } catch (err) {
+    console.error('Cache error: ', err);
+    next();
+  }
+};
 
 // Get all products with caching
-router.get('/products', checkCache, RouteErrorHandler(async (req, res) => {
-  const products = await db.getProducts();
+router.get('/products', checkCacheProductList, RouteErrorHandler(async (req, res) => {
+  const productId = req.params.id;
+  const products = await db.getProducts(productId);
   await cache.cacheProductListAsync(products);
   res.status(200).json(products);
 }));
 
-router.get('/products/:id', checkCache, RouteErrorHandler(async (req, res) => {
+router.get('/products/:id', checkCacheProductId, RouteErrorHandler(async (req, res) => {
   const productId = req.params.id
   const product = await db.getProductById(productId);
   if (product) {
