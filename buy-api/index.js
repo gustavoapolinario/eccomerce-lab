@@ -1,7 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const productRoutesWithCache = require('./Routes/productRoutesWithCache');
-const productRoutesWithoutCache = require('./Routes/productRoutesWithoutCache');
+const buyRoutes = require('./Routes/buyRoutes');
 const healthcheck = require('./Routes/healthCheckRoutes');
 
 const app = express();
@@ -11,8 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // Use routes
-app.use(productRoutesWithCache);
-app.use(productRoutesWithoutCache);
+app.use(buyRoutes);
 app.use(healthcheck);
 
 // Error handling middleware

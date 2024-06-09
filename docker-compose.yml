@@ -3,9 +3,6 @@ services:
   front-end:
     image: node:20
     working_dir: /app
-    # build:
-    #   context: front-end
-    #   dockerfile: Dockerfile.development
     environment:
       VUE_APP_BASE_URL: http://localhost:3000/
       PORT: 8080
@@ -13,23 +10,25 @@ services:
       - "8080:8080"
     volumes:
       - ./front-end/:/app/
-    # command: ["ls", "-lah"]
     command: [ "npm", "run", "serve" ]
 
+# Test buy product:
+# curl localhost:3000/products/
+# curl localhost:3000/products/$(curl -s localhost:3000/products/ | jq -r '.[0]._id')
   product-api:
     image: node:20
     working_dir: /app
-    # build:
-    #   context: product-api/
-    #   dockerfile: Dockerfile.development
     environment:
+      PORT: 3000
       MONGODB_ENDPOINT: mongo
       MONGODB_PORT: 27017
       MONGODB_USERNAME: product-api
       MONGODB_PASSWORD: product-api-password
       MONGODB_DATABASE: products
-      PORT: 3000
-      REDIS_URL: redis://default:your_redis_password@redis:6379
+      REDIS_ENDPOINT: redis
+      REDIS_PORT: 6379
+      REDIS_USERNAME: default
+      REDIS_PASSWORD: your_redis_password
     ports:
       - "3000:3000"
     volumes:
@@ -39,19 +38,40 @@ services:
       - mongo
       - redis
 
+# Test buy product:
+# curl -X POST localhost:3001/buy/$(curl -s localhost:3000/products/ | jq -r '.[0]._id')
+  buy-api:
+    image: node:20
+    working_dir: /app
+    environment:
+      PORT: 3001
+      PRODUCT_API_URL: http://product-api:3000
+      RABBITMQ_ENDPOINT: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: rabbitmq
+      RABBITMQ_PASSWORD: rabbitmq-password
+      REDIS_ENDPOINT: redis
+      REDIS_PORT: 6379
+      REDIS_USERNAME: default
+      REDIS_PASSWORD: your_redis_password
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./buy-api/:/app/
+    command: [ "npm", "run", "dev" ]
+    depends_on:
+      - rabbitmq
+      - redis
+
   mongo:
     image: mongo
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
     volumes:
       - ./mongodb/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
       - mongo-data:/data/db
 
   redis:
     image: redis:latest
-    container_name: redis
     command: ["redis-server", "--requirepass", "your_redis_password"]
     ports:
       - "6379:6379"
@@ -60,7 +80,6 @@ services:
 
   rabbitmq:
     image: rabbitmq:3-management
-    container_name: rabbitmq
     ports:
       - "5672:5672"   # RabbitMQ main port
       - "15672:15672" # RabbitMQ management plugin port

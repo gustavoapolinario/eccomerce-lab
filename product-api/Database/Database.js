@@ -9,7 +9,7 @@ class Database {
   async _connect() {
     try {
       const mongodb_endpoint = process.env.MONGODB_ENDPOINT;
-      const mongodb_port = process.env.MONGODB_PORT;
+      const mongodb_port = process.env.MONGODB_PORT || 27017;
       const mongodb_username = process.env.MONGODB_USERNAME;
       const mongodb_password = process.env.MONGODB_PASSWORD;
       const mongodb_database = process.env.MONGODB_DATABASE;
