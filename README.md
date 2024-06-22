@@ -93,6 +93,7 @@ minikube dashboard
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
+kubectl apply -f gitops/databases-helm/mongodb.yml
 helm upgrade --install mongo bitnami/mongodb \
   --set auth.username=product-api \
   --set auth.password=product-api-password \
