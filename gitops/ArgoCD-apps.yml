@@ -1,0 +1,34 @@
+# argocd appset create gitops/ArgoCD-apps.yml --port-forward --port-forward-namespace argocd
+# argocd appset create gitops/ArgoCD-apps.yml --port-forward --port-forward-namespace argocd --upsert # Update
+# argocd appset delete eccomerce-lab-apps --port-forward --port-forward-namespace argocd
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: eccomerce-lab-apps
+  # namespace: argocd
+spec:
+  generators:
+  - git:
+      repoURL: https://github.com/gustavoapolinario/eccomerce-lab.git
+      revision: HEAD
+      directories:
+      - path: gitops/apps/*
+  template:
+    metadata:
+      name: '{{path.basename}}'
+    spec:
+      project: "default"
+      source:
+        repoURL: https://github.com/gustavoapolinario/eccomerce-lab.git
+        targetRevision: HEAD
+        path: '{{path}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'default'
+      syncPolicy:
+        syncOptions:
+        - CreateNamespace=true
+        automated:
+          selfHeal: true
+          prune: true
+          allowEmpty: true

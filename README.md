@@ -106,7 +106,7 @@ minikube dashboard
 
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
-kubectl apply -f gitops/databases-helm/mongodb.yml
+kubectl apply -f gitops/databases-helm/mongodb/mongodb-configmap.yml
 helm upgrade --install mongo bitnami/mongodb \
   --set auth.username=product-api \
   --set auth.password=product-api-password \
@@ -153,7 +153,7 @@ kubectl apply -f gitops/apps/
 kubectl port-forward svc/front-end-service 8080 &
 kubectl port-forward svc/product-api-service 3000 &
 kubectl port-forward svc/buy-api-service 3001 &
-kubectl port-forward svc/kafka-ui 9080:80 &
+kubectl port-forward svc/eccomerce-lab-kafka-ui 9080:80 &
 ```
 
 
@@ -194,4 +194,22 @@ kubectl port-forward svc/argocd-server -n argocd 9090:443
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
 
+
+## Apply databases
+
+The folder gitops/databases-helm/ have all ArgoCD Application needed to install all databases.
+
+```bash
+kubectl apply -f gitops/databases-helm/kafka/
+kubectl apply -f gitops/databases-helm/kafka-ui/
+kubectl apply -f gitops/databases-helm/mongodb/
+kubectl apply -f gitops/databases-helm/rabbitmq/
+kubectl apply -f gitops/databases-helm/redis/
+```
+
+## Apply microservices
+
+To install the apps, We will use the ApplicationSet. It will get all configuration from the github automatically
+
+argocd appset create gitops/ArgoCD-apps.yml --port-forward --port-forward-namespace argocd
 
