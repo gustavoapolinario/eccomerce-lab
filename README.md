@@ -134,7 +134,7 @@ kubectl apply -f gitops/apps/
 kubectl port-forward svc/front-end-service 8080 &
 kubectl port-forward svc/product-api-service 3000 &
 kubectl port-forward svc/buy-api-service 3001 &
-kubectl port-forward svc/kafka-ui 9080 &
+kubectl port-forward svc/kafka-ui 9080:80 &
 
 
 ## Verify Mongodb Data
