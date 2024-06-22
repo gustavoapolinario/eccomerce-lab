@@ -27,6 +27,7 @@ class Consumer {
     };
 
     console.log(`[*] Waiting for messages in queue ${queue_name}`);
+    await this.event.createTopic('test-topic')
     await this.queue.createConsumer(queue_name, consumer)
   }
 

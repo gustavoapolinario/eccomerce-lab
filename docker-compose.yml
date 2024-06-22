@@ -4,12 +4,16 @@ services:
     build:
       context: front-end
       target: final
+      args:
+        VUE_APP_BASE_URL: http://localhost:3000/
+    image: gustavoapolinario/ecommerce-lab-front-end
     ports:
       - "8080:80"
 
   product-api:
     build:
       context: product-api
+    image: gustavoapolinario/ecommerce-lab-product-api
     environment:
       PORT: 3000
       MONGODB_ENDPOINT: mongo
@@ -30,6 +34,7 @@ services:
   buy-api:
     build:
       context: buy-api
+    image: gustavoapolinario/ecommerce-lab-buy-api
     environment:
       PORT: 3001
       PRODUCT_API_URL: http://product-api:3000
@@ -50,6 +55,7 @@ services:
   buy-job:
     build:
       context: buy-job
+    image: gustavoapolinario/ecommerce-lab-buy-job
     environment:
       PORT: 3002
       RABBITMQ_ENDPOINT: rabbitmq

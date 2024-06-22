@@ -15,7 +15,26 @@ class Kafka {
   constructor() {
     console.log(kafka_config)
     this.kafka = new kafkajs(kafka_config);
+    this.admin = this.kafka.admin();
     this.producer = this.kafka.producer();
+  }
+
+  async createTopic(topic) {
+    try {
+      await this.admin.connect();
+      await this.admin.createTopics({
+        topics: [{
+          topic: topic,
+          numPartitions: 3,
+          replicationFactor: 1
+        }]
+      });
+      console.log('Topic created successfully');
+    } catch (error) {
+      console.error('Error creating topic:', error);
+    } finally {
+      await this.admin.disconnect();
+    }
   }
 
   async connect() {

@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-mongodb
+spec:
+  ports:
+    - port: 27017
+  clusterIP: None
+  selector:
+    app: mongo
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+spec:
+  selector:
+    matchLabels:
+      app: mongo
+  serviceName: mongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      securityContext:
+        runAsNonRoot: false
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: mongo
+          image: mongo
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-persistent-storage
+              mountPath: /data/db
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d/mongo-init.js
+              subPath: mongo-init.js
+      volumes:
+        - name: init-script
+          configMap:
+            name: mongo-init-configmap
+  persistentVolumeClaimRetentionPolicy:
+    whenDeleted: Retain
+    whenScaled: Delete
+  volumeClaimTemplates:
+    - metadata:
+        name: mongo-persistent-storage
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 1Gi
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mongo-init-configmap
+data:
+  mongo-init.js: |
+    db = db.getSiblingDB('products'); // Connect to your database (e.g., 'test')
+    db.createUser({
+      user: 'product-api',
+      pwd: 'product-api-password',
+      roles: [
+        {
+          role: 'readWrite',
+          db: 'products'
+        }
+      ]
+    });
+
+    // Optional: Initialize collections and documents
+    db.createCollection('products');
+
+    const products = [
+      { name: 'DVD The Haunting Shadows', price: 80, image: 'https://placehold.co/150/000000/FFFFFF/?font=oswald&text=The+Haunting+Shadows' },
+      { name: 'DVD Whispers in the Dark', price: 20, image: 'https://placehold.co/150/000000/FFFFFF/?font=oswald&text=Whispers+in+the+Dark' },
+      { name: 'DVD The Dollmaker\'s Secret', price: 30, image: 'https://placehold.co/150/000000/FFFFFF/?font=oswald&text=The+Dollmaker\'s+Secret' },
+      { name: 'DVD Echoes of the Past', price: 30, image: 'https://placehold.co/150/000000/FFFFFF/?font=oswald&text=Echoes+of+the+Past' },
+      { name: 'DVD The Cursed Mirror', price: 50, image: 'https://placehold.co/150/000000/FFFFFF/?font=oswald&text=The+Cursed+Mirror' },
+      { name: 'DVD Nightmare Symphony', price: 10, image: 'https://placehold.co/150/000000/FFFFFF/?font=oswald&text=Nightmare+Symphony' },
+      { name: 'DVD The Forgotten Cemetery', price: 60, image: 'https://placehold.co/150/000000/FFFFFF/?font=oswald&text=The+Forgotten+Cemetery' },
+      { name: 'DVD The Haunted Carnival', price: 30, image: 'https://placehold.co/150/000000/FFFFFF/?font=oswald&text=The+Haunted+Carnival' },
+    ];
+
+    db.products.insertMany(products);

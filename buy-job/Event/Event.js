@@ -6,6 +6,10 @@ class Event {
     this.kafka = new Kafka();
   }
 
+  async createTopic(topic) {
+    await this.kafka.createTopic(topic)
+  }
+
   async connect() {
     await this.kafka.connect()
   }

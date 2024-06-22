@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: buy-job-service
+spec:
+  ports:
+  - name: http
+    port: 3002
+    targetPort: 3002
+  selector:
+    app: buy-job
+  type: NodePort
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: buy-job
+  labels:
+    app: buy-job
+spec:
+  # do not include replicas in the manifests if you want replicas to be controlled by HPA
+  replicas: 1
+  selector:
+    matchLabels:
+      app: buy-job
+  template:
+    metadata:
+      labels:
+        app: buy-job
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+      - name: buy-job
+        image: gustavoapolinario/ecommerce-lab-buy-job
+        ports:
+        - containerPort: 3002
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        env:
+        - name: "PORT"
+          value: "3002"
+        - name: "RABBITMQ_ENDPOINT"
+          value: "rabbitmq"
+        - name: "RABBITMQ_PORT"
+          value: "5672"
+        - name: "RABBITMQ_USERNAME"
+          value: "rabbitmq"
+        - name: "RABBITMQ_PASSWORD"
+          value: "rabbitmq-password"
+        - name: "KAFKA_ENDPOINT"
+          value: "kafka"
+        - name: "KAFKA_PORT"
+          value: "9092"
