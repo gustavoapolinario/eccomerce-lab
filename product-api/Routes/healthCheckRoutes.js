@@ -3,9 +3,6 @@ const Cache = require('../Cache/Cache');
 const Database = require('../Database/Database');
 const router = express.Router();
 
-const cache = new Cache();
-const db = new Database();
-
 /**
  * Health check to be used on Liveness Probes health check
  */
@@ -25,6 +22,9 @@ router.get('/healthcheck', async (req, res) => {
  */
 router.get('/healthcheck-integrations', async (req, res) => {
   try {
+    const cache = new Cache();
+    const db = new Database();
+    
     // Check Redis connection
     await cache.client.ping();
     

@@ -123,6 +123,9 @@ helm upgrade --install kafka bitnami/kafka \
   --set listeners.client.protocol=PLAINTEXT \
   --version 29.3.4
 
+helm repo add kafka-ui https://provectus.github.io/kafka-ui-charts
+helm install kafka-ui kafka-ui/kafka-ui -f gitops/databases-helm/kafka-ui.yml
+
 
 kubectl apply -f gitops/apps/
 
@@ -131,6 +134,7 @@ kubectl apply -f gitops/apps/
 kubectl port-forward svc/front-end-service 8080 &
 kubectl port-forward svc/product-api-service 3000 &
 kubectl port-forward svc/buy-api-service 3001 &
+kubectl port-forward svc/kafka-ui 9080 &
 
 
 ## Verify Mongodb Data
