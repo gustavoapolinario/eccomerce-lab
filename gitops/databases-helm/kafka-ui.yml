@@ -1,11 +1,29 @@
-yamlApplicationConfig:
-  kafka:
-    clusters:
-      - name: kafka
-        bootstrapServers:  kafka:9092
-  auth:
-    type: disabled
-  management:
-    health:
-      ldap:
-        enabled: false
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eccomerce-lab-kafka-ui
+  namespace: argocd
+spec:
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default
+  project: default
+  source:
+    chart: kafka-ui
+    repoURL: https://provectus.github.io/kafka-ui-charts
+    targetRevision: 0.7.6
+    helm:
+      values: |
+        yamlApplicationConfig:
+          kafka:
+            clusters:
+              - name: kafka
+                bootstrapServers: kafka:9092
+          auth:
+            type: disabled
+          management:
+            health:
+              ldap:
+                enabled: false
+  syncPolicy:
+    automated: {}

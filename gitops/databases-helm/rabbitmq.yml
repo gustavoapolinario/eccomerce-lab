@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: eccomerce-lab-mongodb
+  name: eccomerce-lab-rabbitmq
   namespace: argocd
 spec:
   destination:
@@ -9,21 +9,16 @@ spec:
     namespace: default
   project: default
   source:
-    chart: mongodb
+    chart: rabbitmq
     repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 15.6.9
+    targetRevision: 14.4.4
     helm:
       parameters:
         - name: auth.username
-          value: product-api
+          value: rabbitmq
         - name: auth.password
-          value: product-api-password
-        - name: auth.database
-          value: products
+          value: rabbitmq-password
         - name: persistence.size
           value: 1Gi
-        - name: initdbScriptsConfigMap
-          value: mongo-init-configmap
   syncPolicy:
     automated: {}
-

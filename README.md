@@ -51,11 +51,15 @@ The docker compose start the environment with all envs who the apps need.
 
 ## Dev Environment
 
+```bash
 docker compose -f docker-compose-dev.yml up
+```
 
 ## Local tests with image builds
 
+```bash
 docker compose up
+```
 
 ## How to test
 
@@ -63,31 +67,40 @@ http://localhost:8080/
 
 ## Logs
 
+```bash
 docker compose logs -f
+```
 
 
 ## Container Image
 
 ### Build Image
 
+```bash
 docker compose build
+```
 
 or
 
 docker compose build [NAME]
+
 ex: docker compose build front-end
 
 ### Pull Image
 
+```bash
 docker compose push
+```
 
 or
 
 docker compose push [NAME]
+
 ex: docker compose push front-end
 
 # Minikube
 
+```bash
 minikube start
 minikube dashboard
 
@@ -125,29 +138,60 @@ helm upgrade --install kafka bitnami/kafka \
   --version 29.3.4
 
 helm repo add kafka-ui https://provectus.github.io/kafka-ui-charts
-helm install kafka-ui kafka-ui/kafka-ui -f gitops/databases-helm/kafka-ui.yml
-
+helm install kafka-ui kafka-ui/kafka-ui \
+  --set kafka.clusters[0].name=kafka \
+  --set kafka.clusters[0].bootstrapServers=kafka:9092 \
+  --set auth.type=disabled \
+  --set management.health.ldap.enabled=false
 
 kubectl apply -f gitops/apps/
+```
 
 ## Test applications
 
+```bash
 kubectl port-forward svc/front-end-service 8080 &
 kubectl port-forward svc/product-api-service 3000 &
 kubectl port-forward svc/buy-api-service 3001 &
 kubectl port-forward svc/kafka-ui 9080:80 &
+```
 
 
 ## Verify Mongodb Data
+
+```bash
 kubectl run -i --tty --rm mongo-client --image=mongo --restart=Never -- bash
 mongosh "mongodb://product-api:product-api-password@mongo-mongodb:27017/products"
 db.products.find().pretty()
+```
 
 ## Verify Redis Data
+
+```bash
 kubectl run -i --tty --rm redis-client --image=redis --restart=Never -- bash
 redis-cli -h redis-master -a your_redis_password
 KEYS *
+```
 
 
+# GitOps with ArgoCD
+
+## Install ArgoCD
+
+```bash
+kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.5.8/manifests/install.yaml
+```
+
+## Acess the UI
+
+```bash
+kubectl port-forward svc/argocd-server -n argocd 9090:443
+```
+
+## Get Admin Password
+
+```bash
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
+```
 
 

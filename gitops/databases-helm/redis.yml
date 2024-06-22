@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: eccomerce-lab-redis
+  namespace: argocd
+spec:
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: default
+  project: default
+  source:
+    chart: redis
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 19.5.5
+    helm:
+      parameters:
+        - name: global.redis.password
+          value: your_redis_password
+        - name: master.persistence.size
+          value: 300Mi
+        - name: replica.persistence.size
+          value: 300Mi
+        - name: replica.replicaCount
+          value: "1"
+  syncPolicy:
+    automated: {}
+
