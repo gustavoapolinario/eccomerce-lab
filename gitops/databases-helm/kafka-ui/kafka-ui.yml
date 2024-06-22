@@ -18,7 +18,7 @@ spec:
           kafka:
             clusters:
               - name: kafka
-                bootstrapServers: kafka:9092
+                bootstrapServers: eccomerce-lab-kafka:9092
           auth:
             type: disabled
           management:
