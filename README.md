@@ -43,6 +43,9 @@ This project receive the product bought in Queue and process it.
 After bought, service generates an Event on Kafka.
 
 
+<br>
+<hr>
+
 # Docker compose
 
 To dev and test the applications, I created a docker compose configuration.
@@ -82,11 +85,13 @@ docker compose build
 
 or
 
+```bash
 docker compose build [NAME]
-
 ex: docker compose build front-end
+```
 
-### Pull Image
+
+### Push Image
 
 ```bash
 docker compose push
@@ -94,16 +99,27 @@ docker compose push
 
 or
 
+```bash
 docker compose push [NAME]
-
 ex: docker compose push front-end
+```
+
+<br>
+<hr>
+
 
 # Minikube
+
+## Start Minikube
 
 ```bash
 minikube start
 minikube dashboard
+```
 
+## Install Databases
+
+```bash
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 kubectl apply -f gitops/databases-helm/mongodb/mongodb-configmap.yml
@@ -143,7 +159,11 @@ helm install kafka-ui kafka-ui/kafka-ui \
   --set kafka.clusters[0].bootstrapServers=kafka:9092 \
   --set auth.type=disabled \
   --set management.health.ldap.enabled=false
+```
 
+## Install microservices
+
+```bash
 kubectl apply -f gitops/apps/
 ```
 
@@ -173,8 +193,30 @@ redis-cli -h redis-master -a your_redis_password
 KEYS *
 ```
 
+## Clean up
+
+```bash
+kubectl delete -f gitops/apps/
+helm uninstall mongo
+helm uninstall redis
+helm uninstall rabbitmq
+helm uninstall kafka bitnami/kafka
+helm uninstall kafka-ui
+kubectl delete -f gitops/databases-helm/mongodb/mongodb-configmap.yml
+```
+
+
+<br>
+<hr>
 
 # GitOps with ArgoCD
+
+## Start Minikube
+
+```bash
+minikube start
+minikube dashboard
+```
 
 ## Install ArgoCD
 
@@ -194,8 +236,7 @@ kubectl port-forward svc/argocd-server -n argocd 9090:443
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
 
-
-## Apply databases
+## Install databases
 
 The folder gitops/databases-helm/ have all ArgoCD Application needed to install all databases.
 
@@ -207,9 +248,21 @@ kubectl apply -f gitops/databases-helm/rabbitmq/
 kubectl apply -f gitops/databases-helm/redis/
 ```
 
-## Apply microservices
+## Install microservices
 
 To install the apps, We will use the ApplicationSet. It will get all configuration from the github automatically
 
+```bash
 argocd appset create gitops/ArgoCD-apps.yml --port-forward --port-forward-namespace argocd
+```
 
+## Clean up
+
+```bash
+argocd app delete argocd/eccomerce-lab-redis --cascade --port-forward --port-forward-namespace argocd
+argocd app delete argocd/eccomerce-lab-rabbitmq --cascade --port-forward --port-forward-namespace argocd
+argocd app delete argocd/eccomerce-lab-kafka --cascade --port-forward --port-forward-namespace argocd
+argocd app delete argocd/eccomerce-lab-kafka-ui --cascade --port-forward --port-forward-namespace argocd
+argocd app delete argocd/eccomerce-lab-mongodb --cascade --port-forward --port-forward-namespace argocd
+argocd appset delete eccomerce-lab-apps
+```
