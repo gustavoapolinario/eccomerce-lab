@@ -8,7 +8,7 @@ services:
         VUE_APP_BASE_URL: http://localhost:3000/
     image: gustavoapolinario/ecommerce-lab-front-end
     ports:
-      - "8080:80"
+      - "8080:8080"
 
   product-api:
     build:
